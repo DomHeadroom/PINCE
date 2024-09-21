@@ -168,7 +168,7 @@ if __name__ == "__main__":
         locale = None
     if not locale:
         locale = get_locale()
-    locale_file = utils.get_script_directory() + f"/i18n/qm/{locale}.qm"
+    locale_file = f"{utils.get_script_directory()}/i18n/qm/{locale}.qm"
     translator.load(locale_file)
     app.installTranslator(translator)
     tr.translate()
@@ -558,16 +558,16 @@ class MainForm(QMainWindow, MainWindow):
         self.treeWidget_AddressTable.header().setSortIndicatorClearable(True)
         self.treeWidget_AddressTable.header().setSortIndicator(-1, Qt.SortOrder.AscendingOrder)  # Clear sort indicator
         icons_directory = guiutils.get_icons_directory()
-        self.pushButton_AttachProcess.setIcon(QIcon(QPixmap(icons_directory + "/monitor.png")))
-        self.pushButton_Open.setIcon(QIcon(QPixmap(icons_directory + "/folder.png")))
-        self.pushButton_Save.setIcon(QIcon(QPixmap(icons_directory + "/disk.png")))
-        self.pushButton_Settings.setIcon(QIcon(QPixmap(icons_directory + "/wrench.png")))
-        self.pushButton_CopyToAddressTable.setIcon(QIcon(QPixmap(icons_directory + "/arrow_down.png")))
-        self.pushButton_CleanAddressTable.setIcon(QIcon(QPixmap(icons_directory + "/bin_closed.png")))
-        self.pushButton_RefreshAdressTable.setIcon(QIcon(QPixmap(icons_directory + "/table_refresh.png")))
-        self.pushButton_Console.setIcon(QIcon(QPixmap(icons_directory + "/application_xp_terminal.png")))
-        self.pushButton_Wiki.setIcon(QIcon(QPixmap(icons_directory + "/book_open.png")))
-        self.pushButton_About.setIcon(QIcon(QPixmap(icons_directory + "/information.png")))
+        self.pushButton_AttachProcess.setIcon(QIcon(QPixmap(f"{icons_directory}/monitor.png")))
+        self.pushButton_Open.setIcon(QIcon(QPixmap(f"{icons_directory}/folder.png")))
+        self.pushButton_Save.setIcon(QIcon(QPixmap(f"{icons_directory}/disk.png")))
+        self.pushButton_Settings.setIcon(QIcon(QPixmap(f"{icons_directory}/wrench.png")))
+        self.pushButton_CopyToAddressTable.setIcon(QIcon(QPixmap(f"{icons_directory}/arrow_down.png")))
+        self.pushButton_CleanAddressTable.setIcon(QIcon(QPixmap(f"{icons_directory}/bin_closed.png")))
+        self.pushButton_RefreshAdressTable.setIcon(QIcon(QPixmap(f"{icons_directory}/table_refresh.png")))
+        self.pushButton_Console.setIcon(QIcon(QPixmap(f"{icons_directory}/application_xp_terminal.png")))
+        self.pushButton_Wiki.setIcon(QIcon(QPixmap(f"{icons_directory}/book_open.png")))
+        self.pushButton_About.setIcon(QIcon(QPixmap(f"{icons_directory}/information.png")))
         self.pushButton_NextScan.setEnabled(False)
         self.pushButton_UndoScan.setEnabled(False)
         self.flashAttachButton = True
@@ -656,10 +656,10 @@ class MainForm(QMainWindow, MainWindow):
         debugcore.set_gdb_output_mode(settings.gdb_output_mode)
         for hotkey in hotkeys.get_hotkeys():
             try:
-                hotkey.change_key(self.settings.value("Hotkeys/" + hotkey.name))
+                hotkey.change_key(self.settings.value(f"Hotkeys/{hotkey.name}"))
             except:
                 # if the hotkey cannot be applied for whatever reason, reset it to the default
-                self.settings.setValue("Hotkeys/" + hotkey.name, hotkey.default)
+                self.settings.setValue(f"Hotkeys/{hotkey.name}", hotkey.default)
                 hotkey.change_key(hotkey.default)
 
         try:
@@ -831,7 +831,7 @@ class MainForm(QMainWindow, MainWindow):
                 what_reads.setEnabled(False)
                 what_accesses.setEnabled(False)
         font_size = self.treeWidget_AddressTable.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             delete_record: self.delete_records,
@@ -1422,17 +1422,17 @@ class MainForm(QMainWindow, MainWindow):
                 search_for = search_for.replace(".", ",")
                 search_for2 = search_for2.replace(".", ",")
         elif scan_index == typedefs.SCAN_INDEX.STRING:
-            search_for = '" ' + search_for
+            search_for = f'" {search_for}'
         elif self.checkBox_Hex.isChecked():
             if not search_for.startswith(("0x", "-0x")):
                 negative_str = "-" if search_for.startswith("-") else ""
-                search_for = negative_str + "0x" + search_for.lstrip("-")
+                search_for = f"{negative_str}0x" + search_for.lstrip("-")
             if not search_for2.startswith(("0x", "-0x")):
                 negative_str = "-" if search_for.startswith("-") else ""
-                search_for2 = negative_str + "0x" + search_for2.lstrip("-")
+                search_for2 = f"{negative_str}0x" + search_for2.lstrip("-")
 
         if type_index == typedefs.SCAN_TYPE.BETWEEN:
-            return search_for + ".." + search_for2
+            return f"{search_for}..{search_for2}"
         cmp_symbols = {
             typedefs.SCAN_TYPE.INCREASED_BY: "+",
             typedefs.SCAN_TYPE.DECREASED_BY: "-",
@@ -1440,10 +1440,10 @@ class MainForm(QMainWindow, MainWindow):
             typedefs.SCAN_TYPE.MORE: ">",
         }
         if type_index in cmp_symbols:
-            return cmp_symbols[type_index] + " " + search_for
+            return f"{cmp_symbols[type_index]} {search_for}"
 
         if type_index == typedefs.SCAN_TYPE.NOT:
-            search_for = "!= " + search_for
+            search_for = f"!= {search_for}"
         return search_for
 
     def pushButton_NextScan_clicked(self):
@@ -1466,7 +1466,7 @@ class MainForm(QMainWindow, MainWindow):
         row = 0  # go back to using n when unknown issue gets fixed
         self.tableWidget_valuesearchtable.setSortingEnabled(False)
         for n, address, offset, region_type, val, result_type in matches:
-            address = "0x" + address
+            address = f"0x{address}"
             result = result_type.split(" ")[0]
             if result == "unknown":  # Ignore unknown entries for now
                 continue
@@ -1593,7 +1593,7 @@ class MainForm(QMainWindow, MainWindow):
         for item in selected_rows:
             rows.add(item.row())
 
-        scanmem.send_command("delete {}".format(",".join([str(row) for row in rows])))
+        scanmem.send_command(f'delete {",".join([str(row) for row in rows])}')
 
         # remove the rows from the table - removing in reverse sorted order to avoid index issues
         for row in sorted(rows, reverse=True):
@@ -1621,7 +1621,7 @@ class MainForm(QMainWindow, MainWindow):
         self.comboBox_ScanType_init()
         self.lineEdit_Scan.setValidator(guiutils.validator_map[validator_str])
         self.lineEdit_Scan2.setValidator(guiutils.validator_map[validator_str])
-        scanmem.send_command("option scan_data_type {}".format(scanmem_type))
+        scanmem.send_command(f"option scan_data_type {scanmem_type}")
         # according to scanmem instructions you should always do `reset` after changing type
         scanmem.reset()
 
@@ -1702,7 +1702,7 @@ class MainForm(QMainWindow, MainWindow):
     # Changes appearance whenever a new process is created or attached
     def on_new_process(self):
         name = utils.get_process_name(debugcore.currentpid)
-        self.label_SelectedProcess.setText(str(debugcore.currentpid) + " - " + name)
+        self.label_SelectedProcess.setText(f"{str(debugcore.currentpid)} - {name}")
 
         # enable scan GUI
         self.lineEdit_Scan.setPlaceholderText(tr.SCAN_FOR)
@@ -2169,7 +2169,7 @@ class ManualAddressDialogForm(QDialog, ManualAddressDialog):
         menu = QMenu()
         refresh = menu.addAction(tr.REFRESH)
         font_size = self.label_Value.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {refresh: self.update_value}
         try:
@@ -2479,7 +2479,7 @@ class LoadingDialogForm(QDialog, LoadingDialog):
         self.background_thread.output_ready.connect(self.accept)
         self.pushButton_Cancel.clicked.connect(self.close)
         media_directory = utils.get_media_directory()
-        self.movie = QMovie(media_directory + "/LoadingDialog/ajax-loader.gif", QByteArray())
+        self.movie = QMovie(f"{media_directory}/LoadingDialog/ajax-loader.gif", QByteArray())
         self.label_Animated.setMovie(self.movie)
         self.movie.setScaledSize(QSize(25, 25))
         self.movie.setCacheMode(QMovie.CacheMode.CacheAll)
@@ -2634,7 +2634,7 @@ class SettingsDialogForm(QDialog, SettingsDialog):
         self.hotkey_to_value = {}  # Dict[str:str]-->Dict[Hotkey.name:settings_value]
         self.handle_signals_data = ""
         icons_directory = guiutils.get_icons_directory()
-        self.pushButton_GDBPath.setIcon(QIcon(QPixmap(icons_directory + "/folder.png")))
+        self.pushButton_GDBPath.setIcon(QIcon(QPixmap(f"{icons_directory}/folder.png")))
         locale_model = QStandardItemModel()
         for loc, name in language_list.items():
             item = QStandardItem()
@@ -2693,7 +2693,7 @@ class SettingsDialogForm(QDialog, SettingsDialog):
         self.settings.setValue("General/logo_path", self.comboBox_Logo.currentText())
         self.settings.setValue("General/theme", self.comboBox_Theme.currentText())
         for hotkey in hotkeys.get_hotkeys():
-            self.settings.setValue("Hotkeys/" + hotkey.name, self.hotkey_to_value[hotkey.name])
+            self.settings.setValue(f"Hotkeys/{hotkey.name}", self.hotkey_to_value[hotkey.name])
         if self.radioButton_SimpleDLopenCall.isChecked():
             injection_method = typedefs.INJECTION_METHOD.DLOPEN
         elif self.radioButton_AdvancedInjection.isChecked():
@@ -2744,7 +2744,7 @@ class SettingsDialogForm(QDialog, SettingsDialog):
             self.comboBox_Logo.setCurrentText(self.settings.value("General/logo_path", type=str))
         self.hotkey_to_value.clear()
         for hotkey in hotkeys.get_hotkeys():
-            self.hotkey_to_value[hotkey.name] = self.settings.value("Hotkeys/" + hotkey.name)
+            self.hotkey_to_value[hotkey.name] = self.settings.value(f"Hotkeys/{hotkey.name}")
         self.listWidget_Functions_current_row_changed(self.listWidget_Functions.currentRow())
         code_injection_method = self.settings.value("CodeInjection/code_injection_method", type=int)
         if code_injection_method == typedefs.INJECTION_METHOD.DLOPEN:
@@ -2841,7 +2841,7 @@ class SettingsDialogForm(QDialog, SettingsDialog):
             # keyboard does recognize meta key (win key) as alt, setting manually
             if ev.scan_code == 125 or ev.scan_code == 126:
                 ev.name = "windows"
-            hotkey_string += ev.name + "+"
+            hotkey_string += f"{ev.name}+"
 
         # remove the last plus
         hotkey_string = hotkey_string[:-1]
@@ -2957,7 +2957,7 @@ class ConsoleWidgetForm(QWidget, ConsoleWidget):
                 console_output = debugcore.send_command(console_input, cli_output=True)
             else:
                 console_output = debugcore.send_command(console_input)
-        self.textBrowser.append("-->" + console_input)
+        self.textBrowser.append(f"-->{console_input}")
         if console_output:
             self.textBrowser.append(console_output)
         self.scroll_to_bottom()
@@ -3337,7 +3337,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
         menu = QMenu()
         copy_label = menu.addAction(tr.COPY_CLIPBOARD)
         font_size = self.label_HexView_Information.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {copy_label: copy_to_clipboard}
         try:
@@ -3372,7 +3372,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
         else:
             guiutils.delete_menu_entries(menu, [watchpoint_menu.menuAction()])
         font_size = self.widget_HexView.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             edit: self.exec_hex_view_edit_dialog,
@@ -3831,7 +3831,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
             self.float_registers_widget.update_registers()
         app.processEvents()
         time1 = time()
-        print("UPDATED MEMORYVIEW IN:" + str(time1 - time0))
+        print(f"UPDATED MEMORYVIEW IN:{str(time1 - time0)}")
         self.updating_memoryview = False
 
     def on_process_running(self):
@@ -3942,7 +3942,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
             menu.clear()
             menu.addMenu(clipboard_menu)
         font_size = self.tableWidget_StackTrace.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             switch_to_stack: lambda: self.set_stack_widget(self.Stack),
@@ -4033,7 +4033,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
             menu.clear()
             menu.addMenu(clipboard_menu)
         font_size = self.tableWidget_Stack.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             switch_to_stacktrace: lambda: self.set_stack_widget(self.StackTrace),
@@ -4331,7 +4331,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
         copy_comment = clipboard_menu.addAction(tr.COPY_COMMENT)
         copy_all = clipboard_menu.addAction(tr.COPY_ALL)
         font_size = self.tableWidget_Disassemble.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             go_to: self.exec_disassemble_go_to_dialog,
@@ -4527,7 +4527,7 @@ class MemoryViewWindowForm(QMainWindow, MemoryViewWindow):
         if call_dialog.exec():
             result = debugcore.call_function_from_inferior(call_dialog.get_values())
             if result[0]:
-                QMessageBox.information(self, tr.SUCCESS, result[0] + " = " + result[1])
+                QMessageBox.information(self, tr.SUCCESS, f"{result[0]} = {result[1]}")
             else:
                 QMessageBox.information(self, tr.ERROR, tr.CALL_EXPRESSION_FAILED.format(call_dialog.get_values()))
 
@@ -4626,7 +4626,7 @@ class BookmarkWidgetForm(QWidget, BookmarkWidget):
         menu.addSeparator()
         refresh = menu.addAction(f"{tr.REFRESH}[R]")
         font_size = self.listWidget.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             add_entry: self.exec_add_entry_dialog,
@@ -4680,7 +4680,7 @@ class FloatRegisterWidgetForm(QTabWidget, FloatRegisterWidget):
         elif self.currentWidget() == self.XMM:
             current_table_widget = self.tableWidget_XMM
         else:
-            raise Exception("Current widget is invalid: " + str(self.currentWidget().objectName()))
+            raise Exception(f"Current widget is invalid: {str(self.currentWidget().objectName())}")
         current_register = current_table_widget.item(current_row, FLOAT_REGISTERS_NAME_COL).text()
         current_value = current_table_widget.item(current_row, FLOAT_REGISTERS_VALUE_COL).text()
         label_text = tr.ENTER_REGISTER_VALUE.format(current_register.upper())
@@ -4744,7 +4744,7 @@ class RestoreInstructionsWidgetForm(QWidget, RestoreInstructionsWidget):
         menu.addSeparator()
         refresh = menu.addAction(f"{tr.REFRESH}[R]")
         font_size = self.tableWidget_Instructions.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {restore_instruction: lambda: self.restore_instruction(selected_address_int), refresh: self.refresh}
         try:
@@ -4896,7 +4896,7 @@ class BreakpointInfoWidgetForm(QTabWidget, BreakpointInfoWidget):
             guiutils.delete_menu_entries(menu, deletion_list)
         refresh = menu.addAction(f"{tr.REFRESH}[R]")
         font_size = self.tableWidget_BreakpointInfo.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             change_condition: lambda: self.parent().add_breakpoint_condition(current_address_int),
@@ -4955,7 +4955,7 @@ class TrackWatchpointWidgetForm(QWidget, TrackWatchpointWidget):
         elif watchpoint_type == typedefs.WATCHPOINT_TYPE.BOTH:
             string = tr.OPCODE_ACCESSING_TO.format(address)
         else:
-            raise Exception("Watchpoint type is invalid: " + str(watchpoint_type))
+            raise Exception(f"Watchpoint type is invalid: {str(watchpoint_type)}")
         self.setWindowTitle(string)
         guiutils.center_to_parent(self)  # Called before the QMessageBox to center its position properly
         self.breakpoints = debugcore.track_watchpoint(address, length, watchpoint_type)
@@ -4993,10 +4993,10 @@ class TrackWatchpointWidgetForm(QWidget, TrackWatchpointWidget):
         key = key_list[self.last_selected_row]
         self.textBrowser_Info.clear()
         for item in info[key][2]:
-            self.textBrowser_Info.append(item + "=" + info[key][2][item])
+            self.textBrowser_Info.append(f"{item}={info[key][2][item]}")
         self.textBrowser_Info.append(" ")
         for item in info[key][3]:
-            self.textBrowser_Info.append(item + "=" + info[key][3][item])
+            self.textBrowser_Info.append(f"{item}={info[key][3][item]}")
         self.textBrowser_Info.verticalScrollBar().setValue(self.textBrowser_Info.verticalScrollBar().minimum())
         self.textBrowser_Disassemble.setPlainText(info[key][4])
 
@@ -5072,7 +5072,7 @@ class TrackBreakpointWidgetForm(QWidget, TrackBreakpointWidget):
                 )
                 self.tableWidget_TrackInfo.setItem(row, TRACK_BREAKPOINT_ADDR_COL, QTableWidgetItem(address))
                 self.tableWidget_TrackInfo.setItem(
-                    row, TRACK_BREAKPOINT_SOURCE_COL, QTableWidgetItem("[" + register_expression + "]")
+                    row, TRACK_BREAKPOINT_SOURCE_COL, QTableWidgetItem(f"[{register_expression}]")
                 )
         self.update_values()
 
@@ -5161,7 +5161,7 @@ class TraceInstructionsWaitWidgetForm(QWidget, TraceInstructionsWaitWidget):
         self.address = address
         self.tracer = tracer
         media_directory = utils.get_media_directory()
-        self.movie = QMovie(media_directory + "/TraceInstructionsWaitWidget/ajax-loader.gif", QByteArray())
+        self.movie = QMovie(f"{media_directory}/TraceInstructionsWaitWidget/ajax-loader.gif", QByteArray())
         self.label_Animated.setMovie(self.movie)
         self.movie.setScaledSize(QSize(215, 100))
         self.movie.setCacheMode(QMovie.CacheMode.CacheAll)
@@ -5235,7 +5235,7 @@ class TraceInstructionsWindowForm(QMainWindow, TraceInstructionsWindow):
         current_dict = QTreeWidgetItem_current.trace_data[1]
         if current_dict:
             for key in current_dict:
-                self.textBrowser_RegisterInfo.append(str(key) + " = " + str(current_dict[key]))
+                self.textBrowser_RegisterInfo.append(f"{str(key)} = {str(current_dict[key])}")
             self.textBrowser_RegisterInfo.verticalScrollBar().setValue(
                 self.textBrowser_RegisterInfo.verticalScrollBar().minimum()
             )
@@ -5285,7 +5285,7 @@ class TraceInstructionsWindowForm(QMainWindow, TraceInstructionsWindow):
         expand_all = menu.addAction(tr.EXPAND_ALL)
         collapse_all = menu.addAction(tr.COLLAPSE_ALL)
         font_size = self.treeWidget_InstructionInfo.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             expand_all: self.treeWidget_InstructionInfo.expandAll,
@@ -5318,7 +5318,7 @@ class FunctionsInfoWidgetForm(QWidget, FunctionsInfoWidget):
         self.tableWidget_SymbolInfo.itemDoubleClicked.connect(self.tableWidget_SymbolInfo_item_double_clicked)
         self.tableWidget_SymbolInfo.contextMenuEvent = self.tableWidget_SymbolInfo_context_menu_event
         icons_directory = guiutils.get_icons_directory()
-        self.pushButton_Help.setIcon(QIcon(QPixmap(icons_directory + "/help.png")))
+        self.pushButton_Help.setIcon(QIcon(QPixmap(f"{icons_directory}/help.png")))
         self.pushButton_Help.clicked.connect(self.pushButton_Help_clicked)
         guiutils.center_to_parent(self)
 
@@ -5378,7 +5378,7 @@ class FunctionsInfoWidgetForm(QWidget, FunctionsInfoWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address, copy_symbol])
         font_size = self.tableWidget_SymbolInfo.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             copy_address: lambda: copy_to_clipboard(selected_row, FUNCTIONS_INFO_ADDR_COL),
@@ -5611,7 +5611,7 @@ class SearchOpcodeWidgetForm(QWidget, SearchOpcodeWidget):
         self.lineEdit_End.setText(end)
         self.tableWidget_Opcodes.setColumnWidth(SEARCH_OPCODE_ADDR_COL, 250)
         icons_directory = guiutils.get_icons_directory()
-        self.pushButton_Help.setIcon(QIcon(QPixmap(icons_directory + "/help.png")))
+        self.pushButton_Help.setIcon(QIcon(QPixmap(f"{icons_directory}/help.png")))
         self.pushButton_Help.clicked.connect(self.pushButton_Help_clicked)
         self.pushButton_Search.clicked.connect(self.refresh_table)
         self.shortcut_search = QShortcut(QKeySequence("Return"), self)
@@ -5673,7 +5673,7 @@ class SearchOpcodeWidgetForm(QWidget, SearchOpcodeWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address, copy_opcode])
         font_size = self.tableWidget_Opcodes.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             copy_address: lambda: copy_to_clipboard(selected_row, SEARCH_OPCODE_ADDR_COL),
@@ -5702,7 +5702,7 @@ class MemoryRegionsWidgetForm(QWidget, MemoryRegionsWidget):
         self.tableWidget_MemoryRegions.setRowCount(0)
         self.tableWidget_MemoryRegions.setRowCount(len(memory_regions))
         for row, (start, end, perms, offset, _, _, path) in enumerate(memory_regions):
-            address = start + "-" + end
+            address = f"{start}-{end}"
             self.tableWidget_MemoryRegions.setItem(row, MEMORY_REGIONS_ADDR_COL, QTableWidgetItem(address))
             self.tableWidget_MemoryRegions.setItem(row, MEMORY_REGIONS_PERM_COL, QTableWidgetItem(perms))
             self.tableWidget_MemoryRegions.setItem(row, MEMORY_REGIONS_OFFSET_COL, QTableWidgetItem(offset))
@@ -5724,7 +5724,7 @@ class MemoryRegionsWidgetForm(QWidget, MemoryRegionsWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_addresses, copy_offset, copy_path])
         font_size = self.tableWidget_MemoryRegions.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             refresh: self.refresh_table,
@@ -5824,7 +5824,7 @@ class DissectCodeDialogForm(QDialog, DissectCodeDialog):
         self.tableWidget_ExecutableMemoryRegions.setRowCount(0)
         self.tableWidget_ExecutableMemoryRegions.setRowCount(len(executable_regions))
         for row, (start, end, _, _, _, _, path) in enumerate(executable_regions):
-            address = start + "-" + end
+            address = f"{start}-{end}"
             self.region_list.append((start, end))
             self.tableWidget_ExecutableMemoryRegions.setItem(row, DISSECT_CODE_ADDR_COL, QTableWidgetItem(address))
             self.tableWidget_ExecutableMemoryRegions.setItem(row, DISSECT_CODE_PATH_COL, QTableWidgetItem(path))
@@ -5911,7 +5911,7 @@ class ReferencedStringsWidgetForm(QWidget, ReferencedStringsWidget):
             self_len = 0
         else:
             self_len = len(hex_str) - index
-        return "0x" + hex_str[2:].zfill(self.hex_len + self_len)
+        return f"0x{hex_str[2:].zfill(self.hex_len + self_len)}"
 
     def refresh_table(self):
         item_list = debugcore.search_referenced_strings(
@@ -5968,7 +5968,7 @@ class ReferencedStringsWidgetForm(QWidget, ReferencedStringsWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address, copy_value])
         font_size = self.tableWidget_References.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {
             copy_address: lambda: copy_to_clipboard(selected_row, REF_STR_ADDR_COL),
@@ -5990,7 +5990,7 @@ class ReferencedStringsWidgetForm(QWidget, ReferencedStringsWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address])
         font_size = self.listWidget_Referrers.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {copy_address: lambda: copy_to_clipboard(selected_row)}
         try:
@@ -6037,7 +6037,7 @@ class ReferencedCallsWidgetForm(QWidget, ReferencedCallsWidget):
             self_len = 0
         else:
             self_len = len(hex_str) - index
-        return "0x" + hex_str[2:].zfill(self.hex_len + self_len)
+        return f"0x{hex_str[2:].zfill(self.hex_len + self_len)}"
 
     def refresh_table(self):
         item_list = debugcore.search_referenced_calls(
@@ -6087,7 +6087,7 @@ class ReferencedCallsWidgetForm(QWidget, ReferencedCallsWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address])
         font_size = self.tableWidget_References.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {copy_address: lambda: copy_to_clipboard(selected_row, REF_CALL_ADDR_COL)}
         try:
@@ -6106,7 +6106,7 @@ class ReferencedCallsWidgetForm(QWidget, ReferencedCallsWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address])
         font_size = self.listWidget_Referrers.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {copy_address: lambda: copy_to_clipboard(selected_row)}
         try:
@@ -6141,7 +6141,7 @@ class ExamineReferrersWidgetForm(QWidget, ExamineReferrersWidget):
             self_len = 0
         else:
             self_len = len(hex_str) - index
-        return "0x" + hex_str[2:].zfill(self.hex_len + self_len)
+        return f"0x{hex_str[2:].zfill(self.hex_len + self_len)}"
 
     def collect_referrer_data(self):
         jmp_dict, call_dict = debugcore.get_dissect_code_data(False, True, True)
@@ -6221,7 +6221,7 @@ class ExamineReferrersWidgetForm(QWidget, ExamineReferrersWidget):
         if selected_row == -1:
             guiutils.delete_menu_entries(menu, [copy_address])
         font_size = self.listWidget_Referrers.font().pointSize()
-        menu.setStyleSheet("font-size: " + str(font_size) + "pt;")
+        menu.setStyleSheet(f"font-size: {str(font_size)}pt;")
         action = menu.exec(event.globalPos())
         actions = {copy_address: lambda: copy_to_clipboard(selected_row)}
         try:
@@ -6236,7 +6236,7 @@ class PointerScanSearchDialogForm(QDialog, PointerScanSearchDialog):
         self.setupUi(self)
         guiutils.center_to_parent(self)
         self.lineEdit_Address.setText(address)
-        self.lineEdit_Path.setText(os.getcwd() + f"/{utils.get_process_name(debugcore.currentpid)}.scandata")
+        self.lineEdit_Path.setText(f"{os.getcwd()}/{utils.get_process_name(debugcore.currentpid)}.scandata")
         self.pushButton_PathBrowse.clicked.connect(self.pushButton_PathBrowse_clicked)
         self.scan_button: QPushButton | None = self.buttonBox.addButton(tr.SCAN, QDialogButtonBox.ButtonRole.ActionRole)
         if self.scan_button:
